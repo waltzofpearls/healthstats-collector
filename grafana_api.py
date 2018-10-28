@@ -18,35 +18,38 @@ class GrafanaAPI():
         utc = datetime.datetime.now()
         now = tz.fromutc(utc)
         midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        duration = (now - midnight).seconds
+        seconds_from_midnight = (now - midnight).seconds
 
         # start from 1 hour ago and end at the current time
-        start = now - datetime.timedelta(hours=1)
-        end = now
+        from_time = now - datetime.timedelta(hours=1)
+        to_time = now
 
         # when it's the first hour of the day, start from 2 hours ago
         # so we can also grab the activities from the last hour of yesterday
-        if duration <= 3600:
-            start = now - datetime.timedelta(hours=2)
+        if seconds_from_midnight <= 3600:
+            from_time = now - datetime.timedelta(hours=2)
 
         for activity in activities:
             ts = math.floor(activity['beginTimestamp'] / 1000)
             utc = datetime.datetime.utcfromtimestamp(ts)
+            duration = math.ceil(activity['duration'])
+            delta = datetime.timedelta(seconds=duration)
             time = tz.fromutc(utc)
-            if time < start or time > end:
-                continue
-            self.annotation({
-                'time': int(time.timestamp() * 1000),
-                'timeEnd': math.ceil((time.timestamp() + activity['duration']) * 1000),
-                'isRegion': True,
-                'tags': ['healthstats'],
-                'text': '{} with time {}, average HR {}, and calories {}'.format(
-                    activity['activityName'],
-                    str(datetime.timedelta(seconds=math.ceil(activity['duration']))),
-                    activity['averageHR'],
-                    activity['calories']
-                )
-            })
+            time_end = time + delta
+            if from_time < time <= to_time \
+                or from_time < time_end <= to_time:
+                self.annotation({
+                    'time': int(time.timestamp() * 1000),
+                    'timeEnd': int(time_end.timestamp() * 1000),
+                    'isRegion': True,
+                    'tags': ['healthstats'],
+                    'text': '{} with time {}, average HR {}, and calories {}'.format(
+                        activity['activityName'],
+                        str(delta),
+                        activity['averageHR'],
+                        activity['calories']
+                    )
+                })
 
     def annotation(self, data):
         '''
