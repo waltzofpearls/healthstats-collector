@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  healthstats:
+    build:
+      context: .
+      dockerfile: Dockerfile.cron.amd64
+    env_file: .env
+    restart: always
