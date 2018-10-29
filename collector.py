@@ -18,13 +18,6 @@ def main():
                         format='%(asctime)s [%(name)s:%(levelname)s] %(message)s')
     logger = logging.getLogger()
 
-    home = str(Path.home())
-    with open(home + '/.garmin') as f:
-        creds = json.load(f)
-    os.environ['GARMIN_USERNAME'] = creds['u']
-    os.environ['GARMIN_PASSWORD'] = creds['p']
-    os.environ['GRAFANA_API_KEY'] = creds['g']
-
     connect = GarminConnect(logger)
     metrics = PrometheusMetrics(logger)
     grafana = GrafanaAPI(logger)

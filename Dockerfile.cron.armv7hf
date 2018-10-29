@@ -13,4 +13,4 @@ COPY . /healthstats
 RUN chmod +x /healthstats/entrypoint.sh
 
 ENTRYPOINT ["/healthstats/entrypoint.sh"]
-CMD env - `cat $HOME/.env` /usr/bin/python3 /healthstats/collector.py
+CMD ["cron", "-f"]
