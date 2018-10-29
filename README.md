@@ -31,3 +31,36 @@ To run this tool, you have two options:
 - cron job: `make cron`
 
 PROFIT!
+
+## List of metrics
+
+| Metric name | Description |
+| ----------- | ----------- |
+| `weight_total` | Body weight in KG |
+| `weight_body_fat` | Body fat in % |
+| `weight_bone_mass` | Bone mass in KG |
+| `weight_bmi` | BMI |
+| `weight_body_water` | Body water in % |
+| `weight_muscle_mass` | Muscle mass in KG |
+| `resting_heart_rate` | Resting heart rate |
+| `heart_rate_resting` | Resting heart rate |
+| `heart_rate_min` | Minimum heart rate |
+| `heart_rate_max` | Maximum heart rate |
+| `steps` | Total steps |
+| `steps_daily_goal` | Daily step goal |
+| `distance_meters` | Total distance in meters |
+| `active_seconds` | Seconds in movement |
+| `sedentary_seconds` | Seconds in sedentary position |
+| `calories` | Total calories |
+| `calories_active` | Active calories |
+| `calories_resting` | Resting calories |
+| `intensity_minutes_moderate` | Minutes in moderate intensity activities |
+| `intensity_minutes_vigorous` | Minutes in vigorous intensity activities |
+| `floors_ascended` | Floors ascended |
+| `floors_ascended_meters` | Floors ascended in meters |
+| `floors_descended` | Floors descended |
+| `floors_descended_meters` | Floors descended in meters |
+| `sleep_time_sec` | Total sleep time in seconds |
+| `sleep_deep_sec` | Deep sleep time in seconds |
+| `sleep_light_sec` | Light sleep time in seconds |
+| `sleep_awake_sec` | Sleep awake time in seconds |
