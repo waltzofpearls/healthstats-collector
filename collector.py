@@ -41,6 +41,7 @@ def main():
     metrics.publish()
 
     time.sleep(1)
+
     logger.info('Downloading activities data ...')
     data = connect.get_activities()
     logger.info('Creating grafana annotations ...')
