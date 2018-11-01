@@ -59,7 +59,7 @@ install_dashboards() {
     if [[ -f "${dashboard}" ]]; then
       echo "Installing dashboard ${dashboard}"
 
-      if grafana_api POST /api/dashboards/db "" "${dashboard}"; then
+      if grafana_api POST /api/dashboards/import "" "${dashboard}"; then
         echo "installed ok"
       else
         echo "install failed"
