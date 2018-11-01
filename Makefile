@@ -14,5 +14,10 @@ run:
 cron:
 	docker-compose up -d
 
+off:
+	docker-compose down
+
 clean:
 	docker-compose down
+	docker volume rm healthstats-collector_grafana_data
+	docker volume rm healthstats-collector_prometheus_data
