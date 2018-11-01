@@ -1,4 +1,12 @@
-version: '3'
+version: '2.1'
+
+networks:
+  monitor-net:
+    driver: bridge
+
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
 
 networks:
   monitor-net:
