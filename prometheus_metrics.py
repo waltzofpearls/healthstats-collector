@@ -14,14 +14,13 @@ class PrometheusMetrics:
         self.timezone = os.environ.get("TIMEZONE", "UTC")
 
     def summary(self, data):
-        self._weight(data)
         self._heart_rate(data)
         self._intensity_minutes(data)
         self._steps(data)
         self._floors(data)
         self._calories(data)
 
-    def _weight(self, data):
+    def weight(self, data):
         if (
             data.get("weight") is None
             or data.get("weight") == 0
