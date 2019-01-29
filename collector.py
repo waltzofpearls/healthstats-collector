@@ -27,8 +27,15 @@ def main():
 
     logger.info('Downloading summary data ...')
     data = connect.get_summary()
-    logger.info('Generating weight, resting heart rate, steps, floor and calorie metrics ...')
+    logger.info('Generating resting heart rate, steps, floor and calorie metrics ...')
     metrics.summary(data)
+
+    time.sleep(1)
+
+    logger.info('Downloading weight data ...')
+    data = connect.get_weight()
+    logger.info('Generating weight metrics ...')
+    metrics.weight(data)
 
     time.sleep(1)
 

@@ -24,6 +24,7 @@ class GarminConnect():
     wellness_url = modern_proxy_url + '/wellness-service/wellness'
     sleep_daily_url = wellness_url + '/dailySleepData'
     summary_url = modern_proxy_url + '/usersummary-service/usersummary/daily'
+    weight_url = modern_proxy_url + '/weight-service/weight/latest'
     activities_url = modern_proxy_url + '/activitylist-service/activities/search/activities'
 
     def __init__(self, logger):
@@ -104,56 +105,56 @@ class GarminConnect():
 
     def get_summary(self):
         '''
-        [{
+        {
         	"userProfileId": 48251499,
         	"displayName": null,
-        	"totalKilocalories": 2525.0,
-        	"activeKilocalories": 71.0,
-        	"bmrKilocalories": 2454.0,
-        	"wellnessKilocalories": 2525.0,
+        	"totalKilocalories": 2296.0,
+        	"activeKilocalories": 356.0,
+        	"bmrKilocalories": 1940.0,
+        	"wellnessKilocalories": 2296.0,
         	"burnedKilocalories": null,
         	"consumedKilocalories": null,
-        	"remainingKilocalories": 2525.0,
-        	"totalSteps": 4136,
+        	"remainingKilocalories": 2296.0,
+        	"totalSteps": 3961,
         	"netCalorieGoal": null,
-        	"totalDistanceMeters": 3350,
-        	"wellnessDistanceMeters": 3350,
-        	"wellnessActiveKilocalories": 71.0,
-        	"netRemainingKilocalories": 71.0,
+        	"totalDistanceMeters": 3208,
+        	"wellnessDistanceMeters": 3208,
+        	"wellnessActiveKilocalories": 356.0,
+        	"netRemainingKilocalories": 356.0,
         	"userDailySummaryId": 48251499,
-        	"calendarDate": "2018-10-22",
+        	"calendarDate": "2019-01-28",
         	"rule": {
         		"typeId": 4,
         		"typeKey": "groups"
         	},
-        	"uuid": "a48067837f9c433484f3d3908ce8823f",
-        	"dailyStepGoal": 5832,
-        	"wellnessStartTimeGmt": "2018-10-22T07:00:00.0",
-        	"wellnessStartTimeLocal": "2018-10-22T00:00:00.0",
-        	"wellnessEndTimeGmt": "2018-10-23T07:00:00.0",
-        	"wellnessEndTimeLocal": "2018-10-23T00:00:00.0",
-        	"durationInMilliseconds": 86400000,
+        	"uuid": "9a4581f9ab3b4573a4943e35d73d4833",
+        	"dailyStepGoal": 4845,
+        	"wellnessStartTimeGmt": "2019-01-28T08:00:00.0",
+        	"wellnessStartTimeLocal": "2019-01-28T00:00:00.0",
+        	"wellnessEndTimeGmt": "2019-01-29T02:44:00.0",
+        	"wellnessEndTimeLocal": "2019-01-28T18:44:00.0",
+        	"durationInMilliseconds": 67440000,
         	"wellnessDescription": null,
-        	"highlyActiveSeconds": 155,
-        	"activeSeconds": 2342,
-        	"sedentarySeconds": 51683,
-        	"sleepingSeconds": 32220,
+        	"highlyActiveSeconds": 352,
+        	"activeSeconds": 2246,
+        	"sedentarySeconds": 64842,
+        	"sleepingSeconds": 0,
         	"includesWellnessData": true,
         	"includesActivityData": false,
         	"includesCalorieConsumedData": false,
         	"privacyProtected": false,
         	"moderateIntensityMinutes": 0,
         	"vigorousIntensityMinutes": 0,
-        	"floorsAscendedInMeters": 40.377,
-        	"floorsDescendedInMeters": 22.309,
-        	"floorsAscended": 13.24705,
-        	"floorsDescended": 7.31923,
+        	"floorsAscendedInMeters": 40.876,
+        	"floorsDescendedInMeters": 26.274,
+        	"floorsAscended": 13.41076,
+        	"floorsDescended": 8.62008,
         	"intensityMinutesGoal": 150,
         	"userFloorsAscendedGoal": 10,
-        	"minHeartRate": 42,
-        	"maxHeartRate": 107,
-        	"restingHeartRate": 58,
-        	"lastSevenDaysAvgRestingHeartRate": 62,
+        	"minHeartRate": 60,
+        	"maxHeartRate": 126,
+        	"restingHeartRate": 71,
+        	"lastSevenDaysAvgRestingHeartRate": 67,
         	"source": "GARMIN",
         	"averageStressLevel": null,
         	"maxStressLevel": null,
@@ -175,22 +176,10 @@ class GarminConnect():
         	"stressQualifier": null,
         	"measurableAwakeDuration": null,
         	"measurableAsleepDuration": null,
-        	"lastSyncTimestampGMT": null,
-        	"weight": 106490.0,
-        	"bmi": 33.6,
-        	"bodyFat": 33.81,
-        	"bodyWater": 48.31,
-        	"boneMass": 5989,
-        	"muscleMass": 39830,
-        	"physiqueRating": null,
-        	"visceralFat": null,
-        	"metabolicAge": null,
-        	"caloricIntake": null,
-        	"biometricsTimeLocal": "2018-10-22T12:31:16.0",
-        	"biometricsTimeGmt": "2018-10-22T19:31:16.0",
-        	"minAvgHeartRate": 43,
-        	"maxAvgHeartRate": 103
-        }]
+        	"lastSyncTimestampGMT": "2019-01-29T02:45:10.912",
+        	"minAvgHeartRate": 60,
+        	"maxAvgHeartRate": 126
+        }
         '''
         try:
             response = self.get(self.summary_url + '/' + self.display_name, {
@@ -201,6 +190,32 @@ class GarminConnect():
             self.logger.error(traceback.format_exc())
         return {}
 
+    def get_weight(self):
+        '''
+        {
+        	"date": 1548666397000,
+        	"version": 1548695197000,
+        	"weight": 109590.0,
+        	"bmi": 34.6,
+        	"bodyFat": 35.0,
+        	"bodyWater": 47.44,
+        	"boneMass": 6079,
+        	"muscleMass": 40590,
+        	"physiqueRating": null,
+        	"visceralFat": null,
+        	"metabolicAge": null,
+        	"caloricIntake": null,
+        	"sourceType": "INDEX_SCALE"
+        }
+        '''
+        try:
+            response = self.get(self.weight_url, {
+                'date': self.formatted_date,
+            })
+            return response.json()
+        except Exception as e:
+            self.logger.error(traceback.format_exc())
+        return {}
 
     def get_sleep(self):
         '''
