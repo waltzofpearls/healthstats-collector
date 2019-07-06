@@ -5,6 +5,7 @@ import os
 import pytz
 import re
 import requests
+import time
 import traceback
 
 
@@ -13,8 +14,7 @@ class GarminConnect():
 
     sso_url = 'https://sso.garmin.com/sso'
     sso_login_url = sso_url + '/signin'
-    login_url = base_url + "/en-US/signin"
-    css_url = 'https://static.garmincdn.com/com.garmin.connect/ui/css/gauth-custom-v1.2-min.css'
+    login_url = base_url + '/signin'
 
     modern_url = base_url + '/modern'
     modern_proxy_url = modern_url + '/proxy'
@@ -42,13 +42,13 @@ class GarminConnect():
     def to_localtime(self, datetime_in_utc):
         return pytz.timezone(self.timezone).fromutc(datetime_in_utc)
 
-    def get(self, url, params={}):
-        response = self.session.get(url, params=params)
+    def get(self, url, params={}, headers={}):
+        response = self.session.get(url, params=params, headers=headers)
         response.raise_for_status()
         return response
 
-    def post(self, url, params, data):
-        response = self.session.post(url, params=params, data=data)
+    def post(self, url, params, data, headers={}):
+        response = self.session.post(url, params=params, data=data, headers=headers)
         response.raise_for_status()
         return response
 
@@ -61,36 +61,52 @@ class GarminConnect():
     def login(self):
         params = {
             'service': self.modern_url,
-            'webhost': self.base_url,
+            'webhost': self.modern_url,
             'source': self.login_url,
             'redirectAfterAccountLoginUrl': self.modern_url,
             'redirectAfterAccountCreationUrl': self.modern_url,
             'gauthHost': self.sso_url,
             'locale': 'en_US',
             'id': 'gauth-widget',
-            'cssUrl': self.css_url,
+            'cssUrl': 'https://static.garmincdn.com/com.garmin.connect/ui/css/gauth-custom-v1.2-min.css',
+            'privacyStatementUrl': 'https://www.garmin.com/en-US/privacy/connect/',
             'clientId': 'GarminConnect',
             'rememberMeShown': 'true',
             'rememberMeChecked': 'false',
             'createAccountShown': 'true',
             'openCreateAccount': 'false',
-            'usernameShown': 'false',
             'displayNameShown': 'false',
             'consumeServiceTicket': 'false',
             'initialFocus': 'true',
             'embedWidget': 'false',
-            'generateExtraServiceTicket': 'false'
+            'generateExtraServiceTicket': 'true',
+            'generateTwoExtraServiceTickets': 'false',
+            'generateNoServiceTicket': 'false',
+            'globalOptInShown': 'true',
+            'globalOptInChecked': 'false',
+            'mobile': 'false',
+            'connectLegalTerms': 'true',
+            'showTermsOfUse': 'false',
+            'showPrivacyPolicy': 'false',
+            'showConnectLegalAge': 'false',
+            'locationPromptShown': 'true',
+            'showPassword': 'true',
         }
-        self.get(self.sso_login_url, params)
+        response = self.get(self.sso_login_url, params, headers={
+            'Referer': self.login_url,
+        })
+        found = re.search(r'<input.+name="_csrf".+value="(\w*)".+/>', response.text, re.M)
+        if not found:
+            return False
         data = {
             'username': self.username,
             'password': self.password,
-            'embed': 'true',
-            'lt': 'e1s1',
-            '_eventId': 'submit',
-            'displayNameRequired': 'false'
+            'embed': 'false',
+            '_csrf': found.group(1),
         }
-        response = self.post(self.sso_login_url, params, data)
+        response = self.post(self.sso_login_url, params, data, headers={
+            'Referer': response.url,
+        })
         found = re.search(r"\?ticket=([\w-]*)", response.text, re.M)
         if not found:
             return False

@@ -4,6 +4,9 @@ Health stats collector downloads health data from garmin connect website, turn t
 and push the metrics to prometheus pushgateway, which exposes a `/metrics` endpoint, and can be scraped by
 prometheus.
 
+Special thank you goes to [tcgoetz/GarminDB](https://github.com/tcgoetz/GarminDB). The garmin connect scraper
+in this repo was largely inspired by GarminDB.
+
 Grafana dashboard built from those metrics:
 
 ![healthstats-dashboard](https://user-images.githubusercontent.com/965430/47626245-4d101400-dae7-11e8-9279-43ab4bcd0803.png)
