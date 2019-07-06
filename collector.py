@@ -23,7 +23,9 @@ def main():
     grafana = GrafanaAPI(logger)
 
     logger.info('Logging in to garmin connect ...')
-    connect.login()
+    if connect.login() == False:
+        logger.error('Failed to log into garmin connect')
+        sys.exit(1)
 
     logger.info('Downloading summary data ...')
     data = connect.get_summary()
