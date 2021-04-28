@@ -16,16 +16,15 @@ class GarminConnect():
     sso_login_url = sso_url + '/signin'
     login_url = base_url + '/signin'
 
-    modern_url = base_url + '/modern'
-    modern_proxy_url = modern_url + '/proxy'
+    base_proxy_url = base_url + '/proxy'
 
-    user_profile_url = modern_proxy_url + '/userprofile-service/userprofile'
+    user_profile_url = base_proxy_url + '/userprofile-service/userprofile'
     personal_info_url = user_profile_url + '/personal-information'
-    wellness_url = modern_proxy_url + '/wellness-service/wellness'
+    wellness_url = base_proxy_url + '/wellness-service/wellness'
     sleep_daily_url = wellness_url + '/dailySleepData'
-    summary_url = modern_proxy_url + '/usersummary-service/usersummary/daily'
-    weight_url = modern_proxy_url + '/weight-service/weight/latest'
-    activities_url = modern_proxy_url + '/activitylist-service/activities/search/activities'
+    summary_url = base_proxy_url + '/usersummary-service/usersummary/daily'
+    weight_url = base_proxy_url + '/weight-service/weight/latest'
+    activities_url = base_proxy_url + '/activitylist-service/activities/search/activities'
 
     def __init__(self, logger):
         self.logger = logger
@@ -60,11 +59,11 @@ class GarminConnect():
 
     def login(self):
         params = {
-            'service': self.modern_url,
-            'webhost': self.modern_url,
+            'service': self.base_url,
+            'webhost': self.base_url,
             'source': self.login_url,
-            'redirectAfterAccountLoginUrl': self.modern_url,
-            'redirectAfterAccountCreationUrl': self.modern_url,
+            'redirectAfterAccountLoginUrl': self.base_url,
+            'redirectAfterAccountCreationUrl': self.base_url,
             'gauthHost': self.sso_url,
             'locale': 'en_US',
             'id': 'gauth-widget',
@@ -111,7 +110,7 @@ class GarminConnect():
         if not found:
             return False
         params = {'ticket' : found.group(1)}
-        response = self.get(self.modern_url, params)
+        response = self.get(self.base_url, params)
         self.user_prefs = self.get_json(response.text, 'VIEWER_USERPREFERENCES')
         self.display_name = self.user_prefs['displayName']
         self.english_units = (self.user_prefs['measurementSystem'] == 'statute_us')
@@ -202,7 +201,7 @@ class GarminConnect():
                 'calendarDate': self.formatted_date,
             })
             return response.json()
-        except Exception as e:
+        except Exception:
             self.logger.error(traceback.format_exc())
         return {}
 
@@ -229,7 +228,7 @@ class GarminConnect():
                 'date': self.formatted_date,
             })
             return response.json()
-        except Exception as e:
+        except Exception:
             self.logger.error(traceback.format_exc())
         return {}
 
@@ -267,7 +266,7 @@ class GarminConnect():
             if 'dailySleepDTO' in data:
                 return data['dailySleepDTO']
             self.logger.info('no daily sleep data from garmin connect')
-        except Exception as e:
+        except Exception:
             self.logger.error(traceback.format_exc())
         return {}
 
@@ -278,6 +277,6 @@ class GarminConnect():
                 'limit': 10
             })
             return response.json()
-        except Exception as e:
+        except Exception:
             self.logger.error(traceback.format_exc())
         return []
