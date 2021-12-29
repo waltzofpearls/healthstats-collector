@@ -20,7 +20,7 @@ Very cool! What do I need to generate a pretty dashboard like that??
 Glad you asked, you will need:
 
 - garmin connect account
-- promethues
+- prometheus
 - pushgateway
 - grafana
 - docker
