@@ -1,1 +1,1 @@
-0 */1 * * * env - `cat $HOME/.env` /usr/bin/python3 /healthstats/collector.py > /proc/1/fd/1 2>/proc/1/fd/2
+0 */1 * * * env - `cat $HOME/.env` python /healthstats/collector.py > /proc/1/fd/1 2>/proc/1/fd/2
