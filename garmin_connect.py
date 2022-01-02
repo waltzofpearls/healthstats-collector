@@ -1,10 +1,9 @@
-import cfscrape
+import cloudscraper
 import datetime
 import json
 import os
 import pytz
 import re
-import requests
 import time
 import traceback
 
@@ -16,21 +15,25 @@ class GarminConnect():
     sso_login_url = sso_url + '/signin'
     login_url = base_url + '/signin'
 
-    base_proxy_url = base_url + '/proxy'
+    modern_url = base_url + '/modern'
+    modern_proxy_url = modern_url + '/proxy'
 
-    user_profile_url = base_proxy_url + '/userprofile-service/userprofile'
+    user_profile_url = modern_proxy_url + '/userprofile-service/userprofile'
     personal_info_url = user_profile_url + '/personal-information'
-    wellness_url = base_proxy_url + '/wellness-service/wellness'
+    wellness_url = modern_proxy_url + '/wellness-service/wellness'
     sleep_daily_url = wellness_url + '/dailySleepData'
-    summary_url = base_proxy_url + '/usersummary-service/usersummary/daily'
-    weight_url = base_proxy_url + '/weight-service/weight/latest'
-    activities_url = base_proxy_url + '/activitylist-service/activities/search/activities'
+    summary_url = modern_proxy_url + '/usersummary-service/usersummary/daily'
+    weight_url = modern_proxy_url + '/weight-service/weight/latest'
+    activities_url = modern_proxy_url + '/activitylist-service/activities/search/activities'
 
     def __init__(self, logger):
         self.logger = logger
-        self.session = cfscrape.create_scraper(
-            sess=requests.session(),
-            delay=15
+        self.session = cloudscraper.create_scraper(
+            browser={
+                'browser': 'firefox',
+                'platform': 'windows',
+                'mobile': False
+            }
         )
         self.username = os.environ.get('GARMIN_USERNAME')
         self.password = os.environ.get('GARMIN_PASSWORD')
@@ -52,22 +55,22 @@ class GarminConnect():
         return response
 
     def get_json(self, page_html, key):
-        found = re.search(key + r" = JSON.parse\(\"(.*)\"\);", page_html, re.M)
+        found = re.search(key + r" = (\{.*\});", page_html, re.M)
         if found:
             json_text = found.group(1).replace('\\"', '"')
             return json.loads(json_text)
 
     def login(self):
         params = {
-            'service': self.base_url,
-            'webhost': self.base_url,
+            'service': self.modern_url,
+            'webhost': self.modern_url,
             'source': self.login_url,
-            'redirectAfterAccountLoginUrl': self.base_url,
-            'redirectAfterAccountCreationUrl': self.base_url,
+            'redirectAfterAccountLoginUrl': self.modern_url,
+            'redirectAfterAccountCreationUrl': self.modern_url,
             'gauthHost': self.sso_url,
             'locale': 'en_US',
             'id': 'gauth-widget',
-            'cssUrl': 'https://static.garmincdn.com/com.garmin.connect/ui/css/gauth-custom-v1.2-min.css',
+            'cssUrl': 'https://connect.garmin.com/gauth-custom-v1.2-min.css',
             'privacyStatementUrl': 'https://www.garmin.com/en-US/privacy/connect/',
             'clientId': 'GarminConnect',
             'rememberMeShown': 'true',
@@ -78,6 +81,7 @@ class GarminConnect():
             'consumeServiceTicket': 'false',
             'initialFocus': 'true',
             'embedWidget': 'false',
+            'socialEnabled': 'false',
             'generateExtraServiceTicket': 'true',
             'generateTwoExtraServiceTickets': 'false',
             'generateNoServiceTicket': 'false',
@@ -90,6 +94,11 @@ class GarminConnect():
             'showConnectLegalAge': 'false',
             'locationPromptShown': 'true',
             'showPassword': 'true',
+            'useCustomHeader': 'false',
+            'mfaRequired': 'false',
+            'performMFACheck': 'false',
+            'rememberMyBrowserShown': 'true',
+            'rememberMyBrowserChecked': 'false',
         }
         response = self.get(self.sso_login_url, params, headers={
             'Referer': self.login_url,
@@ -105,12 +114,13 @@ class GarminConnect():
         }
         response = self.post(self.sso_login_url, params, data, headers={
             'Referer': response.url,
+            'Content-Type': 'application/x-www-form-urlencoded'
         })
         found = re.search(r"\?ticket=([\w-]*)", response.text, re.M)
         if not found:
             return False
         params = {'ticket' : found.group(1)}
-        response = self.get(self.base_url, params)
+        response = self.get(self.modern_url, params)
         self.user_prefs = self.get_json(response.text, 'VIEWER_USERPREFERENCES')
         self.display_name = self.user_prefs['displayName']
         self.english_units = (self.user_prefs['measurementSystem'] == 'statute_us')
@@ -199,6 +209,8 @@ class GarminConnect():
         try:
             response = self.get(self.summary_url + '/' + self.display_name, {
                 'calendarDate': self.formatted_date,
+            }, headers={
+                'NK': 'NT'
             })
             return response.json()
         except Exception:
@@ -226,6 +238,8 @@ class GarminConnect():
         try:
             response = self.get(self.weight_url, {
                 'date': self.formatted_date,
+            }, headers={
+                'NK': 'NT'
             })
             return response.json()
         except Exception:
@@ -261,6 +275,8 @@ class GarminConnect():
         try:
             response = self.get(self.sleep_daily_url + '/' + self.display_name, {
                 'date': self.formatted_date
+            }, headers={
+                'NK': 'NT'
             })
             data = response.json()
             if 'dailySleepDTO' in data:
@@ -275,6 +291,8 @@ class GarminConnect():
             response = self.get(self.activities_url, {
                 'start': 0,
                 'limit': 10
+            }, headers={
+                'NK': 'NT'
             })
             return response.json()
         except Exception:
